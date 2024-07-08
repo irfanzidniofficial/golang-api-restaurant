@@ -16,7 +16,7 @@ func GetRepository(db *gorm.DB) Repository {
 	}
 }
 
-func (m *menuRepo) GetMenu(menuType string) ([]model.MenuItem, error) {
+func (m *menuRepo) GetMenuList(menuType string) ([]model.MenuItem, error) {
 	var menuData []model.MenuItem
 
 	if err := m.db.Where(model.MenuItem{Type: model.MenuType(menuType)}).Find(&menuData).Error; err != nil {
@@ -24,4 +24,17 @@ func (m *menuRepo) GetMenu(menuType string) ([]model.MenuItem, error) {
 	}
 
 	return menuData, nil
+}
+
+// GetMenuList(menuType string) ([]model.MenuItem, error)
+
+func (m *menuRepo) GetMenu(orderCode string) (model.MenuItem, error) {
+
+	var menuData model.MenuItem
+
+	if err := m.db.Where(model.MenuItem{OrderCode: orderCode}).First(&menuData).Error; err != nil {
+		return menuData, err
+	}
+	return menuData, nil
+
 }

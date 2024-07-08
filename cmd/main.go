@@ -4,6 +4,7 @@ import (
 	"golang-api-restaurant/internal/database"
 	"golang-api-restaurant/internal/delivery/rest"
 	mRepo "golang-api-restaurant/internal/respository/menu"
+	oRepo "golang-api-restaurant/internal/respository/order"
 	rUsecase "golang-api-restaurant/internal/usecase/resto"
 
 	"github.com/labstack/echo/v4"
@@ -19,9 +20,10 @@ func main() {
 
 	db := database.GetDB(dbAddress)
 
-	menuRepo:=mRepo.GetRepository(db)
-	restoUsecase:= rUsecase.GetUsecase(menuRepo)
-	h:=rest.NewHandler(restoUsecase)
+	menuRepo := mRepo.GetRepository(db)
+	orderRepo := oRepo.GetRepository(db)
+	restoUsecase := rUsecase.GetUsecase(menuRepo, orderRepo)
+	h := rest.NewHandler(restoUsecase)
 
 	rest.LoadRoutes(e, h)
 
