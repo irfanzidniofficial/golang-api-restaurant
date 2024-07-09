@@ -48,6 +48,7 @@ func (r *restoUsecase) Order(request model.OrderMenuRequest) (model.Order, error
 		ID:            uuid.New().String(),
 		Status:        constant.OrderStatusProccessed,
 		ProductOrders: productOrderData,
+		ReferenceID:   request.ReferenceID,
 	}
 	createOrderData, err := r.orderRepo.CreateOrder(orderData)
 	if err != nil {

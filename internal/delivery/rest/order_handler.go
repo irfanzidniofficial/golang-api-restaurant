@@ -29,3 +29,20 @@ func (h *handler) Order(c echo.Context) error {
 		"data": orderData,
 	})
 }
+
+func (h *handler) GetOrderInfo(c echo.Context) error {
+	orderID := c.Param("orderID")
+
+	orderData, err := h.restoUsecase.GetOrderInfo(model.GerOrderInfoRequest{
+		OrderID: orderID,
+	})
+	if err != nil {
+		fmt.Printf("gor error: %s\n", err.Error())
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"data": orderData,
+	})
+}
