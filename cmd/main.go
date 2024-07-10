@@ -5,6 +5,7 @@ import (
 	"golang-api-restaurant/internal/delivery/rest"
 	mRepo "golang-api-restaurant/internal/respository/menu"
 	oRepo "golang-api-restaurant/internal/respository/order"
+	uRepo "golang-api-restaurant/internal/respository/user"
 	rUsecase "golang-api-restaurant/internal/usecase/resto"
 
 	"github.com/labstack/echo/v4"
@@ -19,11 +20,17 @@ func main() {
 	e := echo.New()
 
 	db := database.GetDB(dbAddress)
+	secret := "AES256Key-32Characters1234567890"
 
 	menuRepo := mRepo.GetRepository(db)
 	orderRepo := oRepo.GetRepository(db)
-	restoUsecase := rUsecase.GetUsecase(menuRepo, orderRepo)
+	userRepo, err := uRepo.GetRepository(db, secret, 1, 64*1024, 4, 32)
+	if err != nil {
+		panic(err)
+	}
+	restoUsecase := rUsecase.GetUsecase(menuRepo, orderRepo, userRepo)
 	h := rest.NewHandler(restoUsecase)
+	rest.LoadMiddlewares(e)
 
 	rest.LoadRoutes(e, h)
 
