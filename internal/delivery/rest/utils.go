@@ -9,7 +9,7 @@ import (
 
 func GetSessionData(r *http.Request) (model.UserSession, error) {
 	authString := r.Header.Get("Authorization")
-	splitString := strings.Split(authString, ",")
+	splitString := strings.Split(authString, "Bearer ")
 	if len(splitString) != 2 {
 		return model.UserSession{}, errors.New("unauthorized")
 	}
