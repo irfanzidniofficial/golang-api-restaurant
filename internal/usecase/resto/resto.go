@@ -47,6 +47,7 @@ func (r *restoUsecase) Order(request model.OrderMenuRequest) (model.Order, error
 	}
 	orderData := model.Order{
 		ID:            uuid.New().String(),
+		UserID:        request.UserID,
 		Status:        constant.OrderStatusProccessed,
 		ProductOrders: productOrderData,
 		ReferenceID:   request.ReferenceID,
@@ -58,10 +59,13 @@ func (r *restoUsecase) Order(request model.OrderMenuRequest) (model.Order, error
 	return createOrderData, nil
 }
 
-func (r *restoUsecase) GetOrderInfo(request model.GerOrderInfoRequest) (model.Order, error) {
+func (r *restoUsecase) GetOrderInfo(request model.GetOrderInfoRequest) (model.Order, error) {
 	orderData, err := r.orderRepo.GetOrderInfo(request.OrderID)
 	if err != nil {
 		return orderData, err
+	}
+	if orderData.UserID!=request.UserID{
+		return model.Order{}, errors.New("unauthorized")
 	}
 	return orderData, nil
 }
@@ -92,22 +96,29 @@ func (r *restoUsecase) RegisterUser(request model.RegisterRequest) (model.User, 
 	return userData, nil
 }
 
-// Login(request model.LoginRequest) (model.UserSession, error)
-func(r *restoUsecase) Login(request model.LoginRequest)(model.UserSession, error){
-	userData, err:=r.userRepo.GetUserData(request.Username)
-	if err!=nil{
+func (r *restoUsecase) Login(request model.LoginRequest) (model.UserSession, error) {
+	userData, err := r.userRepo.GetUserData(request.Username)
+	if err != nil {
 		return model.UserSession{}, err
 	}
-	verified, err:=r.userRepo.VerifyLogin(request.Username, request.Password, userData)
-	if err!=nil{
-        return model.UserSession{}, err
-    }
-	if !verified{
+	verified, err := r.userRepo.VerifyLogin(request.Username, request.Password, userData)
+	if err != nil {
+		return model.UserSession{}, err
+	}
+	if !verified {
 		return model.UserSession{}, errors.New("can't verify user login")
 	}
-	userSession, err:=r.userRepo.CreateUserSession(userData.ID)
-	if err!=nil{
+	userSession, err := r.userRepo.CreateUserSession(userData.ID)
+	if err != nil {
 		return model.UserSession{}, err
 	}
 	return userSession, nil
+}
+
+func (r *restoUsecase) CheckSession(data model.UserSession) (userID string, err error) {
+	userID, err = r.userRepo.CheckSession(data)
+	if err != nil {
+		return "", nil
+	}
+	return userID, nil
 }
