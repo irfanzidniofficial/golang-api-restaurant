@@ -3,18 +3,22 @@ package user
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rsa"
 	"golang-api-restaurant/internal/model"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type userRepo struct {
-	db      *gorm.DB
-	gcm     cipher.AEAD
-	time    uint32
-	memory  uint32
-	threads uint8
-	keyLen  uint32
+	db        *gorm.DB
+	gcm       cipher.AEAD
+	time      uint32
+	memory    uint32
+	threads   uint8
+	keyLen    uint32
+	signKey   *rsa.PrivateKey
+	accessExp time.Duration
 }
 
 func GetRepository(
@@ -24,7 +28,9 @@ func GetRepository(
 	time uint32,
 	memory uint32,
 	threads uint8,
-	keyLen uint32) (Repository, error) {
+	keyLen uint32,
+	signKey *rsa.PrivateKey,
+	accessExp time.Duration) (Repository, error) {
 	block, err := aes.NewCipher([]byte(sercret))
 	if err != nil {
 		return nil, err
@@ -34,12 +40,14 @@ func GetRepository(
 		return nil, err
 	}
 	return &userRepo{
-		db:      db,
-		gcm:     gcm,
-		time:    time,
-		memory:  memory,
-		threads: threads,
-		keyLen:  keyLen,
+		db:        db,
+		gcm:       gcm,
+		time:      time,
+		memory:    memory,
+		threads:   threads,
+		keyLen:    keyLen,
+		signKey:   signKey,
+		accessExp: accessExp,
 	}, nil
 }
 
@@ -62,4 +70,27 @@ func (ur *userRepo) CheckRegistered(username string) (bool, error) {
 		}
 	}
 	return userData.ID != "", nil
+}
+
+func (ur *userRepo) GetUserData(username string) (model.User, error) {
+	var userData model.User
+
+	if err := ur.db.Where(model.User{Username: username}).First(&userData).Error; err != nil {
+		return userData, err
+	}
+	return userData, nil
+
+}
+
+func (ur *userRepo) VerifyLogin(username, password string, userData model.User) (bool, error) {
+	if username != userData.Username {
+		return false, nil
+	}
+
+	verified, err := ur.comparePassword(password, userData.Hash)
+	if err != nil {
+		return false, err
+	}
+	return verified, nil
+
 }
