@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"golang-api-restaurant/internal/database"
 	"golang-api-restaurant/internal/delivery/rest"
+	"golang-api-restaurant/internal/logger"
 	mRepo "golang-api-restaurant/internal/respository/menu"
 	oRepo "golang-api-restaurant/internal/respository/order"
 	uRepo "golang-api-restaurant/internal/respository/user"
@@ -19,6 +20,7 @@ const (
 )
 
 func main() {
+	logger.Init()
 
 	e := echo.New()
 
