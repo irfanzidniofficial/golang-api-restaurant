@@ -3,6 +3,7 @@ package rest
 import (
 	"context"
 	"golang-api-restaurant/internal/model/constant"
+	"golang-api-restaurant/internal/tracking"
 	"golang-api-restaurant/internal/usecase/resto"
 	"net/http"
 
@@ -28,6 +29,8 @@ type authMiddleware struct {
 
 func (am *authMiddleware) CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		ctx, span := tracking.CreateSpan(c.Request().Context(), "CheckAuth")
+		defer span.End()
 		sessionData, err := GetSessionData(c.Request())
 		if err != nil {
 			return &echo.HTTPError{
@@ -37,7 +40,7 @@ func (am *authMiddleware) CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 		}
-		userID, err := am.restoUsecase.CheckSession(sessionData)
+		userID, err := am.restoUsecase.CheckSession(ctx, sessionData)
 		if err != nil {
 			return &echo.HTTPError{
 				Code:     http.StatusUnauthorized,
@@ -47,7 +50,7 @@ func (am *authMiddleware) CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		authContext := context.WithValue(c.Request().Context(), constant.AuthContextKey, userID)
 		c.SetRequest(c.Request().WithContext(authContext))
-		if err:= next(c); err != nil {
+		if err := next(c); err != nil {
 			return err
 		}
 		return nil

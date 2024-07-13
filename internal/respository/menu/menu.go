@@ -1,7 +1,9 @@
 package menu
 
 import (
+	"context"
 	"golang-api-restaurant/internal/model"
+	"golang-api-restaurant/internal/tracking"
 
 	"gorm.io/gorm"
 )
@@ -16,10 +18,12 @@ func GetRepository(db *gorm.DB) Repository {
 	}
 }
 
-func (m *menuRepo) GetMenuList(menuType string) ([]model.MenuItem, error) {
+func (m *menuRepo) GetMenuList(ctx context.Context, menuType string) ([]model.MenuItem, error) {
+	ctx, span := tracking.CreateSpan(ctx, "GetMenuList")
+	defer span.End()
 	var menuData []model.MenuItem
 
-	if err := m.db.Where(model.MenuItem{Type: model.MenuType(menuType)}).Find(&menuData).Error; err != nil {
+	if err := m.db.WithContext(ctx).Where(model.MenuItem{Type: model.MenuType(menuType)}).Find(&menuData).Error; err != nil {
 		return nil, err
 	}
 
@@ -28,11 +32,13 @@ func (m *menuRepo) GetMenuList(menuType string) ([]model.MenuItem, error) {
 
 // GetMenuList(menuType string) ([]model.MenuItem, error)
 
-func (m *menuRepo) GetMenu(orderCode string) (model.MenuItem, error) {
+func (m *menuRepo) GetMenu(ctx context.Context, orderCode string) (model.MenuItem, error) {
+	ctx, span := tracking.CreateSpan(ctx, "GetMenu")
+	defer span.End()
 
 	var menuData model.MenuItem
 
-	if err := m.db.Where(model.MenuItem{OrderCode: orderCode}).First(&menuData).Error; err != nil {
+	if err := m.db.WithContext(ctx).Where(model.MenuItem{OrderCode: orderCode}).First(&menuData).Error; err != nil {
 		return menuData, err
 	}
 	return menuData, nil

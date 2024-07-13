@@ -2,15 +2,19 @@ package rest
 
 import (
 	"fmt"
+	"golang-api-restaurant/internal/tracking"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (h *handler) GetMenuList(c echo.Context) error {
+	ctx, span := tracking.CreateSpan(c.Request().Context(), "GetMenuList")
+	defer span.End()
+
 	menuType := c.FormValue("menu_type")
 
-	menuData, err := h.restoUsecase.GetMenuList(menuType)
+	menuData, err := h.restoUsecase.GetMenuList(ctx, menuType)
 	if err != nil {
 		fmt.Printf("got error: %s\n", err.Error())
 
