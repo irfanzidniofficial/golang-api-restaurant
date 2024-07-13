@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"golang-api-restaurant/internal/model"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -15,7 +15,7 @@ type Claims struct {
 }
 
 func (ur *userRepo) CreateUserSession(ctx context.Context, userID string) (model.UserSession, error) {
-	ctx, span := tracking.CreateSpan(ctx, "CreateUserSession")
+	ctx, span := tracing.CreateSpan(ctx, "CreateUserSession")
 	defer span.End()
 	accessToken, err := ur.generateAccessToken(ctx, userID)
 	if err != nil {
@@ -27,7 +27,7 @@ func (ur *userRepo) CreateUserSession(ctx context.Context, userID string) (model
 }
 
 func (ur *userRepo) generateAccessToken(ctx context.Context, userID string) (string, error) {
-	ctx, span := tracking.CreateSpan(ctx, "generateAccessToken")
+	ctx, span := tracing.CreateSpan(ctx, "generateAccessToken")
 	defer span.End()
 	accessTokenExp := time.Now().Add(ur.accessExp).Unix()
 	accessClaim := Claims{
@@ -42,7 +42,7 @@ func (ur *userRepo) generateAccessToken(ctx context.Context, userID string) (str
 }
 
 func (ur *userRepo) CheckSession(ctx context.Context, data model.UserSession) (userID string, err error) {
-	ctx, span := tracking.CreateSpan(ctx, "CheckSession")
+	ctx, span := tracing.CreateSpan(ctx, "CheckSession")
 	defer span.End()
 	accessToken, err := jwt.ParseWithClaims(data.JWTToken, &Claims{}, func(t *jwt.Token) (interface{}, error) {
 		return &ur.signKey.PublicKey, nil

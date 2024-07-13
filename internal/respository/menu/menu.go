@@ -3,7 +3,7 @@ package menu
 import (
 	"context"
 	"golang-api-restaurant/internal/model"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 
 	"gorm.io/gorm"
 )
@@ -19,7 +19,7 @@ func GetRepository(db *gorm.DB) Repository {
 }
 
 func (m *menuRepo) GetMenuList(ctx context.Context, menuType string) ([]model.MenuItem, error) {
-	ctx, span := tracking.CreateSpan(ctx, "GetMenuList")
+	ctx, span := tracing.CreateSpan(ctx, "GetMenuList")
 	defer span.End()
 	var menuData []model.MenuItem
 
@@ -33,7 +33,7 @@ func (m *menuRepo) GetMenuList(ctx context.Context, menuType string) ([]model.Me
 // GetMenuList(menuType string) ([]model.MenuItem, error)
 
 func (m *menuRepo) GetMenu(ctx context.Context, orderCode string) (model.MenuItem, error) {
-	ctx, span := tracking.CreateSpan(ctx, "GetMenu")
+	ctx, span := tracing.CreateSpan(ctx, "GetMenu")
 	defer span.End()
 
 	var menuData model.MenuItem

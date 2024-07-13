@@ -8,7 +8,7 @@ import (
 	"golang-api-restaurant/internal/respository/menu"
 	"golang-api-restaurant/internal/respository/order"
 	"golang-api-restaurant/internal/respository/user"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 
 	"github.com/google/uuid"
 )
@@ -28,13 +28,13 @@ func GetUsecase(menuRepo menu.Repository, orderRepo order.Repository, userRepo u
 }
 
 func (r *restoUsecase) GetMenuList(ctx context.Context, menuType string) ([]model.MenuItem, error) {
-	ctx, span := tracking.CreateSpan(ctx, "GetMenuList")
+	ctx, span := tracing.CreateSpan(ctx, "GetMenuList")
 	defer span.End()
 	return r.menuRepo.GetMenuList(ctx, menuType)
 }
 
 func (r *restoUsecase) Order(ctx context.Context, request model.OrderMenuRequest) (model.Order, error) {
-	ctx, span := tracking.CreateSpan(ctx, "Order")
+	ctx, span := tracing.CreateSpan(ctx, "Order")
 	defer span.End()
 	productOrderData := make([]model.ProductOrder, len(request.OrderProducts))
 
@@ -66,7 +66,7 @@ func (r *restoUsecase) Order(ctx context.Context, request model.OrderMenuRequest
 }
 
 func (r *restoUsecase) GetOrderInfo(ctx context.Context, request model.GetOrderInfoRequest) (model.Order, error) {
-	ctx, span := tracking.CreateSpan(ctx, "GetOrderInfo")
+	ctx, span := tracing.CreateSpan(ctx, "GetOrderInfo")
 	defer span.End()
 	orderData, err := r.orderRepo.GetOrderInfo(ctx, request.OrderID)
 	if err != nil {
@@ -79,7 +79,7 @@ func (r *restoUsecase) GetOrderInfo(ctx context.Context, request model.GetOrderI
 }
 
 func (r *restoUsecase) RegisterUser(ctx context.Context, request model.RegisterRequest) (model.User, error) {
-	ctx, span := tracking.CreateSpan(ctx, "RegisterUser")
+	ctx, span := tracing.CreateSpan(ctx, "RegisterUser")
 	defer span.End()
 
 	userRegisted, err := r.userRepo.CheckRegistered(ctx, request.Username)
@@ -108,7 +108,7 @@ func (r *restoUsecase) RegisterUser(ctx context.Context, request model.RegisterR
 }
 
 func (r *restoUsecase) Login(ctx context.Context, request model.LoginRequest) (model.UserSession, error) {
-	ctx, span := tracking.CreateSpan(ctx, "Login")
+	ctx, span := tracing.CreateSpan(ctx, "Login")
 	defer span.End()
 	userData, err := r.userRepo.GetUserData(ctx, request.Username)
 	if err != nil {
@@ -129,7 +129,7 @@ func (r *restoUsecase) Login(ctx context.Context, request model.LoginRequest) (m
 }
 
 func (r *restoUsecase) CheckSession(ctx context.Context, data model.UserSession) (userID string, err error) {
-	ctx, span := tracking.CreateSpan(ctx, "CheckSession")
+	ctx, span := tracing.CreateSpan(ctx, "CheckSession")
 	defer span.End()
 	userID, err = r.userRepo.CheckSession(ctx, data)
 	if err != nil {

@@ -1,4 +1,4 @@
-package tracking
+package tracing
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func createTrackingProvider(url string) (*tracesdk.TracerProvider, error) {
+func tracingTrackingProvier(url string) (*tracesdk.TracerProvider, error) {
 	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func createTrackingProvider(url string) (*tracesdk.TracerProvider, error) {
 }
 
 func Init(url string) error {
-	tp, err := createTrackingProvider(url)
+	tp, err := tracingTrackingProvier(url)
 	if err != nil {
 		return err
 	}
@@ -38,11 +38,11 @@ func Init(url string) error {
 }
 
 func CreateSpan(ctx context.Context, name string) (context.Context, trace.Span) {
-	if ctx==nil{
-		ctx= context.Background()
+	if ctx == nil {
+		ctx = context.Background()
 	}
-	tr:=otel.Tracer(name)
-	ctx, span:=tr.Start(ctx, name)
+	tr := otel.Tracer(name)
+	ctx, span := tr.Start(ctx, name)
 	return ctx, span
 
 }

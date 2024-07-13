@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang-api-restaurant/internal/model"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 func (h *handler) RegisterUser(c echo.Context) error {
-	ctx, span := tracking.CreateSpan(c.Request().Context(), "RegisterUser")
+	ctx, span := tracing.CreateSpan(c.Request().Context(), "RegisterUser")
 	defer span.End()
 
 	var request model.RegisterRequest
@@ -36,7 +36,7 @@ func (h *handler) RegisterUser(c echo.Context) error {
 }
 
 func (h *handler) Login(c echo.Context) error {
-	ctx, span := tracking.CreateSpan(c.Request().Context(), "Login")
+	ctx, span := tracing.CreateSpan(c.Request().Context(), "Login")
 	defer span.End()
 
 	var request model.LoginRequest

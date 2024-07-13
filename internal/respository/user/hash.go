@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"strings"
 
 	"golang.org/x/crypto/argon2"
@@ -18,7 +18,7 @@ const (
 )
 
 func (ur *userRepo) GenerateUserHash(ctx context.Context, password string) (hash string, err error) {
-	ctx, span := tracking.CreateSpan(ctx, "GenerateUserHash")
+	ctx, span := tracing.CreateSpan(ctx, "GenerateUserHash")
 	defer span.End()
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
@@ -34,7 +34,7 @@ func (ur *userRepo) GenerateUserHash(ctx context.Context, password string) (hash
 }
 
 func (ur *userRepo) encypt(ctx context.Context, text []byte) string {
-	_, span := tracking.CreateSpan(ctx, "encypt")
+	_, span := tracing.CreateSpan(ctx, "encypt")
 	defer span.End()
 	nonce := make([]byte, ur.gcm.NonceSize())
 	ciphertext := ur.gcm.Seal(nonce, nonce, text, nil)
@@ -43,7 +43,7 @@ func (ur *userRepo) encypt(ctx context.Context, text []byte) string {
 }
 
 func (ur *userRepo) decrypt(ctx context.Context, ciphertext string) ([]byte, error) {
-	_, span := tracking.CreateSpan(ctx, "decrypt")
+	_, span := tracing.CreateSpan(ctx, "decrypt")
 	defer span.End()
 	decoded, err := base64.StdEncoding.DecodeString(ciphertext)
 	if err != nil {
@@ -59,7 +59,7 @@ func (ur *userRepo) decrypt(ctx context.Context, ciphertext string) ([]byte, err
 }
 
 func (ur *userRepo) comparePassword(ctx context.Context, password, hash string) (bool, error) {
-	ctx, span := tracking.CreateSpan(ctx, "comparePassword")
+	ctx, span := tracing.CreateSpan(ctx, "comparePassword")
 	defer span.End()
 	parts := strings.Split(hash, "$")
 

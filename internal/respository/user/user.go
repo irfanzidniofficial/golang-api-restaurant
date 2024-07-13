@@ -6,7 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/rsa"
 	"golang-api-restaurant/internal/model"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"time"
 
 	"gorm.io/gorm"
@@ -54,7 +54,7 @@ func GetRepository(
 }
 
 func (ur *userRepo) RegisterUser(ctx context.Context, userData model.User) (model.User, error) {
-	ctx, span := tracking.CreateSpan(ctx, "RegisterUser")
+	ctx, span := tracing.CreateSpan(ctx, "RegisterUser")
 	defer span.End()
 	if err := ur.db.WithContext(ctx).Create(&userData).Error; err != nil {
 		return model.User{}, err
@@ -64,7 +64,7 @@ func (ur *userRepo) RegisterUser(ctx context.Context, userData model.User) (mode
 }
 
 func (ur *userRepo) CheckRegistered(ctx context.Context, username string) (bool, error) {
-	ctx, span := tracking.CreateSpan(ctx, "CheckRegistered")
+	ctx, span := tracing.CreateSpan(ctx, "CheckRegistered")
 	defer span.End()
 	var userData model.User
 
@@ -79,7 +79,7 @@ func (ur *userRepo) CheckRegistered(ctx context.Context, username string) (bool,
 }
 
 func (ur *userRepo) GetUserData(ctx context.Context, username string) (model.User, error) {
-	ctx, span := tracking.CreateSpan(ctx, "GetUserData")
+	ctx, span := tracing.CreateSpan(ctx, "GetUserData")
 	defer span.End()
 	var userData model.User
 
@@ -91,7 +91,7 @@ func (ur *userRepo) GetUserData(ctx context.Context, username string) (model.Use
 }
 
 func (ur *userRepo) VerifyLogin(ctx context.Context, username, password string, userData model.User) (bool, error) {
-	ctx, span := tracking.CreateSpan(ctx, "VerifyLogin")
+	ctx, span := tracing.CreateSpan(ctx, "VerifyLogin")
 	defer span.End()
 	if username != userData.Username {
 		return false, nil

@@ -9,6 +9,7 @@ import (
 	mRepo "golang-api-restaurant/internal/respository/menu"
 	oRepo "golang-api-restaurant/internal/respository/order"
 	uRepo "golang-api-restaurant/internal/respository/user"
+	"golang-api-restaurant/internal/tracing"
 	rUsecase "golang-api-restaurant/internal/usecase/resto"
 	"time"
 
@@ -20,6 +21,8 @@ const (
 )
 
 func main() {
+
+	tracing.Init("http:localhost:14268/api/traces")
 	logger.Init()
 
 	e := echo.New()

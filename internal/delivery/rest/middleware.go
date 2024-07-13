@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 	"golang-api-restaurant/internal/model/constant"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"golang-api-restaurant/internal/usecase/resto"
 	"net/http"
 
@@ -29,7 +29,7 @@ type authMiddleware struct {
 
 func (am *authMiddleware) CheckAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ctx, span := tracking.CreateSpan(c.Request().Context(), "CheckAuth")
+		ctx, span := tracing.CreateSpan(c.Request().Context(), "CheckAuth")
 		defer span.End()
 		sessionData, err := GetSessionData(c.Request())
 		if err != nil {

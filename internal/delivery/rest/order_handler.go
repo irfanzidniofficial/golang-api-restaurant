@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"golang-api-restaurant/internal/model"
 	"golang-api-restaurant/internal/model/constant"
-	"golang-api-restaurant/internal/tracking"
+	"golang-api-restaurant/internal/tracing"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -13,9 +13,9 @@ import (
 )
 
 func (h *handler) Order(c echo.Context) error {
-	ctx, span:= tracking.CreateSpan(c.Request().Context(), "Order")
+	ctx, span := tracing.CreateSpan(c.Request().Context(), "Order")
 	defer span.End()
-	
+
 	var request model.OrderMenuRequest
 	err := json.NewDecoder(c.Request().Body).Decode(&request)
 	if err != nil {
@@ -40,9 +40,9 @@ func (h *handler) Order(c echo.Context) error {
 }
 
 func (h *handler) GetOrderInfo(c echo.Context) error {
-	ctx, span:= tracking.CreateSpan(c.Request().Context(), "GetOrderInfo")
+	ctx, span := tracing.CreateSpan(c.Request().Context(), "GetOrderInfo")
 	defer span.End()
-	
+
 	orderID := c.Param("orderID")
 	userID := c.Request().Context().Value(constant.AuthContextKey).(string)
 
