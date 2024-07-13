@@ -6,14 +6,17 @@ import (
 	"golang-api-restaurant/internal/tracing"
 	"golang-api-restaurant/internal/usecase/resto"
 	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 )
 
 func LoadMiddlewares(e *echo.Echo) {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"https://restoku.com"},
+	}))
+	e.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{
+		LogLevel: log.ERROR,
 	}))
 }
 
